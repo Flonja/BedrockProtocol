@@ -65,7 +65,7 @@ class AddItemActorPacket extends DataPacket implements ClientboundPacket{
 		$this->item = ItemStackWrapper::read($in);
 		$this->position = $in->getVector3();
 		$this->motion = $in->getVector3();
-		$this->metadata = $in->getEntityMetadata();
+		$this->metadata = $in->getEntityMetadata(); // TODO: convert back?
 		$this->isFromFishing = $in->getBool();
 	}
 

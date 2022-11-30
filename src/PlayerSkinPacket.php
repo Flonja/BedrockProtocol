@@ -16,7 +16,6 @@ namespace pocketmine\network\mcpe\protocol;
 
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 use pocketmine\network\mcpe\protocol\types\skin\SkinData;
-use pocketmine\network\mcpe\protocol\types\skin\SkinImage;
 use Ramsey\Uuid\UuidInterface;
 
 class PlayerSkinPacket extends DataPacket implements ClientboundPacket, ServerboundPacket{
@@ -52,21 +51,8 @@ class PlayerSkinPacket extends DataPacket implements ClientboundPacket, Serverbo
 			$skinId = $in->getString();
 			$this->newSkinName = $in->getString();
 			$this->oldSkinName = $in->getString();
-			$skinData = $in->getString();
-			$capeData = $in->getString();
-			$geometryName = $in->getString();
-			$geometryData = $in->getString();
-			$isPremium = $in->getBool();
-			$this->skin = new SkinData(
-				$skinId,
-				"",
-				null,
-				SkinImage::fromLegacy($skinData),
-				capeImage: SkinImage::fromLegacy($capeData),
-				geometryData: $geometryData,
-				premium: $isPremium,
-				geometryName: $geometryName,
-			);
+			$this->skin = $in->getSkin();
+			$this->skin->setSkinId($skinId);
 		}
 	}
 
@@ -83,11 +69,7 @@ class PlayerSkinPacket extends DataPacket implements ClientboundPacket, Serverbo
 			$out->putString($this->skin->getSkinId());
 			$out->putString($this->newSkinName);
 			$out->putString($this->oldSkinName);
-			$out->putString($this->skin->getSkinImage()->getData());
-			$out->putString($this->skin->getCapeImage()->getData());
-			$out->putString($this->skin->getGeometryName());
-			$out->putString($this->skin->getGeometryData());
-			$out->putBool($this->skin->isPremium());
+			$out->putSkin($this->skin);
 		}
 	}
 

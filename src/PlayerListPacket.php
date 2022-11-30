@@ -16,8 +16,6 @@ namespace pocketmine\network\mcpe\protocol;
 
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
-use pocketmine\network\mcpe\protocol\types\skin\SkinData;
-use pocketmine\network\mcpe\protocol\types\skin\SkinImage;
 use function count;
 
 class PlayerListPacket extends DataPacket implements ClientboundPacket{
@@ -74,19 +72,9 @@ class PlayerListPacket extends DataPacket implements ClientboundPacket{
 					$entry->isHost = $in->getBool();
 				}else{
 					$skinId = $in->getString();
-					$skinData = $in->getString();
-					$capeData = $in->getString();
-					$geometryName = $in->getString();
-					$geometryData = $in->getString();
-					$entry->skinData = new SkinData(
-						$skinId,
-						"",
-						null,
-						SkinImage::fromLegacy($skinData),
-						capeImage: SkinImage::fromLegacy($capeData),
-						geometryData: $geometryData,
-						geometryName: $geometryName,
-					);
+					$entry->skinData = $in->getSkin();
+					$entry->skinData->setSkinId($skinId);
+
 					$entry->xboxUserId = $in->getString();
 					$entry->platformChatId = $in->getString();
 				}
@@ -120,10 +108,8 @@ class PlayerListPacket extends DataPacket implements ClientboundPacket{
 					$out->putBool($entry->isHost);
 				}else{
 					$out->putString($entry->skinData->getSkinId());
-					$out->putString($entry->skinData->getSkinImage()->getData());
-					$out->putString($entry->skinData->getCapeImage()->getData());
-					$out->putString($entry->skinData->getGeometryName());
-					$out->putString($entry->skinData->getGeometryData());
+					$out->putSkin($entry->skinData);
+
 					$out->putString($entry->xboxUserId);
 					$out->putString($entry->platformChatId);
 				}
